@@ -1,17 +1,210 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
+    <Filter Include="見なくていい">
+      <UniqueIdentifier>{d61b4b96-ca53-4e07-a9b5-6c68124676ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ソース ファイル">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
+    <Filter Include="見なくていい\ソース ファイル\Core">
+      <UniqueIdentifier>{af97439f-52ad-41c7-b7ac-8426f0488fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ソース ファイル\ImGui">
+      <UniqueIdentifier>{4356452d-a3e8-44a7-a029-ac6cf882d5a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ソース ファイル\ImGui\Package">
+      <UniqueIdentifier>{fed80ec1-a8ea-4f57-a9d0-b920a504986a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ソース ファイル\Graphic">
+      <UniqueIdentifier>{54258f37-1ebe-4cde-b7b2-5a050e2534c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
+    <Filter Include="見なくていい\ヘッダー ファイル\Core">
+      <UniqueIdentifier>{b6ac9882-97f9-4205-bd6e-90c55b0b7761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ヘッダー ファイル\ImGui">
+      <UniqueIdentifier>{d114208a-2409-4a81-ae89-94ba82f76c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ヘッダー ファイル\ImGui\Package">
+      <UniqueIdentifier>{ff22ed13-a12d-438d-8709-92f77b349cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="見なくていい\ヘッダー ファイル\Graphic">
+      <UniqueIdentifier>{a22314a0-34c3-4079-a443-3a5ac034cc68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="本題">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="本題\ソースファイル">
+      <UniqueIdentifier>{0b8b89b0-3f57-4dd0-9f12-8d57d8016242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="本題\ヘッダーファイル">
+      <UniqueIdentifier>{1ef5c77f-2632-4496-b574-b9993d6654f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\imgui_dx11\ImGuiManager.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\ImGuiTemplate.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\WinMain.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\WindowManager.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\WindowCallback.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\TimeManager.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\Input.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\Application.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui_draw.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui_impl_dx11.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui_impl_win32.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui_tables.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\imgui_widgets.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\implot.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\imgui_dx11\implot_items.cpp">
+      <Filter>見なくていい\ソース ファイル\ImGui\Package</Filter>
+    </ClCompile>
+    <ClCompile Include="source\directx\DDSTextureLoader.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\directx\DirectXGraphics.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\directx\DX11Util.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\directx\WICTextureLoader.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graphic\Shader.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graphic\ShaderBank.cpp">
+      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core\Game.cpp">
+      <Filter>見なくていい\ソース ファイル\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graphic\Terrain.cpp">
+      <Filter>本題\ソースファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\imgui_dx11\ImGuiManager.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\ImGuiTemplate.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Application.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Debug.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Input.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\TimeManager.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\WindowCallback.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\WindowManager.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imconfig.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imgui.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imgui_impl_dx11.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imgui_impl_win32.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imgui_internal.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\implot.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\implot_internal.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imstb_rectpack.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imstb_textedit.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\imgui_dx11\imstb_truetype.h">
+      <Filter>見なくていい\ヘッダー ファイル\ImGui\Package</Filter>
+    </ClInclude>
+    <ClInclude Include="source\directx\DirectXGraphics.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\directx\DX11Settransform.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\directx\DX11Util.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graphic\Shader.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graphic\ShaderBank.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graphic\Light.h">
+      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Macro.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\Game.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graphic\Terrain.h">
+      <Filter>本題\ヘッダーファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="source\core\MyVariables.h">
+      <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
