@@ -90,4 +90,5 @@ struct DS_OUTPUT
 	float4 pos : SV_POSITION;
 	float2 uv:TEXCOORD0;
 	float4 normal : TEXCOORD1;
+    float4 wpos : TEXCOORD2;
 };

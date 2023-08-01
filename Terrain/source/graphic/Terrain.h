@@ -18,7 +18,6 @@ class GpuTerrain
 public:
     void Init();
     void NewMap();
-    void SetPenSRV(std::string _str);
     void Draw(const MyEngine::float3& _camerapos);
 
     void SetMaxLength(const float& _length);
@@ -27,8 +26,6 @@ public:
 protected:
 
     //-----------------------------------------------------------------
-
-    std::vector<float> m_HeightMapBuffer;
     
     // 高さマップ
 #ifdef USE_WICTEX
@@ -70,7 +67,6 @@ protected:
     ComPtr<ID3D11ShaderResourceView> m_factorStructBufferSRV;
     //--------------------------------------------------------------------------
     
-
     // 頂点シェーダ
     ComPtr<ID3D11VertexShader> m_vertexShader;
     // 頂点レイアウト
@@ -87,55 +83,33 @@ protected:
     //---------------------------------------------------------------
     // 高さマップのパッチごとの値を得るCS
     ComPtr<ID3D11ComputeShader> m_heightComputeShader;
-    // レイとの交差判定を取得するCS
-    ComPtr<ID3D11ComputeShader> m_crossComputeShader;
 
     struct Anser {
         XMFLOAT4 factor;
-    };
-    struct ConstantMapProperty
-    {
-        // xyz:テレインワールド座標 w:地面隙間サイズ
-        XMFLOAT4 World;
-        // カメラSpos
-        XMFLOAT4 StartPos;
-        // カメラベクトル
-        XMFLOAT4 EVec;
     };
 
     Anser getdata[16 * 16];
     Anser crossdata[16 * 64 * 2];
 
-    ComPtr<ID3D11Buffer> m_ansstrcuturedBuf;
-    ComPtr<ID3D11UnorderedAccessView> m_ansstrcuturedUAV;
-
-    ComPtr<ID3D11Buffer> m_crossstrcuturedBuf;
-    ComPtr<ID3D11UnorderedAccessView> m_crossstrcuturedUAV;
-
-    ConstantMapProperty m_constantMapProperty;
-    ComPtr<ID3D11Buffer> m_constantMapPropertyBuf;
-
-    ComPtr<ID3D11SamplerState>m_samplerstate;
-    //---------------------------------------------------------------
-
-    // テレインエディタCS
-    ComPtr<ID3D11ComputeShader> m_terrainEditComputeShader;
-
-
     struct ConstantEditProperty
     {
         // xy:uv z:range w:係数
-        XMFLOAT4 UVAndRangeAndCoef;
+        XMFLOAT4 UVAndSeedAndCoef;
         // セットするID x:テクスチャID y:TypeID 
         XMFLOAT4 SetId;
     };
-    
+
     ConstantEditProperty m_constantEditProperty;
     ComPtr<ID3D11Buffer> m_constantEditPropertyBuf;
 
-    //---------------------------------------------------------------
-    std::unordered_map<std::string,ComPtr<ID3D11Resource>> m_pentex;
-    ComPtr<ID3D11ShaderResourceView> m_pentexsrv;
+
+    ComPtr<ID3D11Buffer> m_ansstrcuturedBuf;
+    ComPtr<ID3D11UnorderedAccessView> m_ansstrcuturedUAV;
+
+    ComPtr<ID3D11SamplerState>m_samplerstate;
+
+    std::unordered_map<std::string,ComPtr<ID3D11Resource>> m_gtex;
+    std::unordered_map<std::string, ComPtr<ID3D11ShaderResourceView>> m_gtexsrv;
 
     // 2の乗数
     float m_div = 16;
@@ -144,17 +118,28 @@ protected:
     float m_minLength = 0.5f;
     float m_maxLength = 85.0f;
 
+    float m_uvscale = 8;
     bool CreateIndexAndVertexBuffer();
     bool CreateHeightmapCS();
-    bool CreateCrossPointCS();
-    bool CreateEditCS();
     bool CreateShader();
     bool CreateCSUseSampler();
-    bool CreatePexTexture();
+    bool CreateGraundTexture();
     void UpdateFactor(const MyEngine::float3& _camerapos);
-    void UpdateEditConstantData(const ConstantEditProperty& _Data);
     void CalHeighmapCS();
-    void CalCrossPointCS();
-    void CalEditCS();
+
+    const int gtexvalue = 3;
+
+    const std::vector<std::string> gtexname = 
+    {
+        "rock",
+        "moss",
+        "snow"
+    };
+    const std::vector<std::string> gtexpath = 
+    {
+        "assets/gtex/rock.png",
+        "assets/gtex/moss.png",
+        "assets/gtex/snow.png"
+    };
 };
 

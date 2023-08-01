@@ -1,4 +1,4 @@
-#include "psvscommon.hlsl"
+#include "common.hlsl"
 
 struct DivideParam{
 	float factor[4];

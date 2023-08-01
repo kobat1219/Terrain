@@ -46,6 +46,9 @@
     <Filter Include="本題\ヘッダーファイル">
       <UniqueIdentifier>{1ef5c77f-2632-4496-b574-b9993d6654f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="本題\シェーダーファイル">
+      <UniqueIdentifier>{40c7a5f5-aac2-41d8-9cb4-11c7028ff16a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\imgui_dx11\ImGuiManager.cpp">
@@ -206,5 +209,28 @@
     <ClInclude Include="source\core\MyVariables.h">
       <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shader\csheightfactercal.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\csterrainupdate.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\dsterrain.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\hsterrain.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\psterrain.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\common.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\vsterrain.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

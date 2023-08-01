@@ -13,16 +13,11 @@ void GpuTerrain::Init()
 
 	CreateCSUseSampler();
 
-	CreatePexTexture();
+	CreateGraundTexture();
 
 	NewMap();
-	//Load("assets/terrain/data/heightmap.TIF");
 
 	CreateHeightmapCS();
-
-	CreateCrossPointCS();
-
-	CreateEditCS();
 
 	// テクスチャのパッチごとの係数を得る
 	CalHeighmapCS();
@@ -30,13 +25,6 @@ void GpuTerrain::Init()
 
 void GpuTerrain::NewMap()
 {
-	m_HeightMapBuffer.clear();
-
-	for (size_t i = 0; i < m_heightMapDivSize*m_heightMapDivSize; i++)
-	{
-		m_HeightMapBuffer.emplace_back(0.0f);
-	}
-
 	D3D11_TEXTURE2D_DESC descuav;
 	ZeroMemory(&descuav, sizeof(D3D11_TEXTURE2D_DESC));
 	descuav.Width = m_heightMapDivSize;
@@ -166,7 +154,12 @@ void GpuTerrain::Draw(const MyEngine::float3& _camerapos)
 	device->DSSetShaderResources(0, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
 	device->DSSetShaderResources(1, 1, m_pNormalAndTexT2DBufSRV.GetAddressOf());
 	device->HSSetShaderResources(10, 1, m_factorStructBufferSRV.GetAddressOf());
-	//device->PSSetShaderResources(0, 1, &m_pHeightMapT2DBufSRV);
+
+	for (size_t i = 0; i < gtexvalue; i++)
+	{
+		device->PSSetShaderResources(i, 1, m_gtexsrv[gtexname[i]].GetAddressOf());
+	}
+
 	//device->HSSetShaderResources(0, 1, &m_pHeightMapT2DBufSRV);
 
 	//device->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);			// インデックスバッファをセット
@@ -207,22 +200,22 @@ bool GpuTerrain::CreateIndexAndVertexBuffer()
 			Vertex v;
 			printf("--\n");
 			v.Pos = { -((m_div/2) * m_divsize) + x * m_divsize, 0, -((m_div / 2) * m_divsize) + (z+1) * m_divsize };
-			v.Uv = { (float)x / (float)m_div, (float)(z+1) / (float)m_div};
+			v.Uv = { (float)x* m_uvscale / (float)m_div, (float)(z * m_uvscale + m_uvscale) / (float)m_div};
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + (x+1) * m_divsize, 0, -((m_div / 2) * m_divsize) + (z+1) * m_divsize };
-			v.Uv = { (float)(x+1) / (float)m_div, (float)(z+1) / (float)m_div};
+			v.Uv = { (float)(x * m_uvscale + m_uvscale) / (float)m_div, (float)(z * m_uvscale + m_uvscale) / (float)m_div};
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + (x + 1) * m_divsize, 0, -((m_div / 2) * m_divsize) + z * m_divsize };
-			v.Uv = { (float)(x+1) / (float)m_div, (float)z / (float)m_div };
+			v.Uv = { (float)(x * m_uvscale + m_uvscale) / (float)m_div, (float)z * m_uvscale / (float)m_div };
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + x * m_divsize, 0, -((m_div / 2) * m_divsize) + z * m_divsize };
-			v.Uv = { (float)x / (float)m_div, (float)z / (float)m_div };
+			v.Uv = { (float)x * m_uvscale / (float)m_div, (float)z * m_uvscale / (float)m_div };
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 
@@ -302,84 +295,6 @@ bool GpuTerrain::CreateHeightmapCS()
 	if (sts == false)
 	{
 		MessageBox(nullptr, "CPSHADERERROR", "ERROR", MB_OK);
-		return false;
-	}
-
-
-	return true;
-}
-
-bool GpuTerrain::CreateCrossPointCS()
-{
-	auto device = GetDX11Device();
-	bool sts = CreateComputeShader(
-		device,
-		"shader/csterrainray.hlsl",
-		"CS_Main",
-		"cs_5_0",
-		&m_crossComputeShader);
-
-	if (!sts) {
-		MessageBox(nullptr, "CreateComputeShader error", "error", MB_OK);
-		return false;
-	}
-	// コンピュートシェーダーへの入力時に使用するシェーダーリソースビューを作成する
-	sts = CreateStructuredBuffer(
-		device,
-		sizeof(Anser),
-		ARRAYSIZE(crossdata),
-		&crossdata[0],
-		&m_crossstrcuturedBuf);
-	if (sts == false)
-	{
-		MessageBox(nullptr, "CPSHADERERROR", "ERROR", MB_OK);
-		return false;
-	}
-
-	// コンピュートシェーダーからの出力時に使用するアンオーダードアクセスビューを作成する
-	sts = CreateUnOrderAccessView(device, m_crossstrcuturedBuf.Get(), &m_crossstrcuturedUAV);
-	if (sts == false)
-	{
-		MessageBox(nullptr, "CPSHADERERROR", "ERROR", MB_OK);
-		return false;
-	}
-
-	// コンスタントバッファ作成
-	sts = CreateConstantBuffer(
-		device,			// デバイス
-		sizeof(ConstantMapProperty),	// サイズ
-		&m_constantMapPropertyBuf);			// コンスタントバッファ２
-	if (!sts) {
-		MessageBox(NULL, "CreateBuffer(constant buffer world) error", "Error", MB_OK);
-		return false;
-	}
-
-
-	return true;
-}
-
-bool GpuTerrain::CreateEditCS()
-{
-	auto device = GetDX11Device();
-	bool sts = CreateComputeShader(
-		device,
-		"shader/csterrainupdate.hlsl",
-		"CS_Main",
-		"cs_5_0",
-		&m_terrainEditComputeShader);
-
-	if (!sts) {
-		MessageBox(nullptr, "CreateComputeShader error", "error", MB_OK);
-		return false;
-	}
-
-	// コンスタントバッファ作成
-	sts = CreateConstantBuffer(
-		device,			// デバイス
-		sizeof(ConstantEditProperty),	// サイズ
-		&m_constantEditPropertyBuf);			// コンスタントバッファ２
-	if (!sts) {
-		MessageBox(NULL, "CreateBuffer(constant buffer world) error", "Error", MB_OK);
 		return false;
 	}
 
@@ -487,21 +402,23 @@ bool GpuTerrain::CreateCSUseSampler()
 	return true;
 }
 
-bool GpuTerrain::CreatePexTexture()
+bool GpuTerrain::CreateGraundTexture()
 {
 	auto device = GetDX11Device();
 	auto devicecon = GetDX11DeviceContext();
 	ComPtr<ID3D11Resource> tmp;
-	CreateSRVfromWICFile("assets/pentex/trpen_nomal.png", device, devicecon, tmp.GetAddressOf(), m_pentexsrv.GetAddressOf());
-	m_pentex["nomal"].Swap(tmp);
-	CreateSRVfromWICFile("assets/pentex/trpen_nomal_set.png", device, devicecon, tmp.GetAddressOf(), m_pentexsrv.GetAddressOf());
-	m_pentex["nomal_set"].Swap(tmp);
-	CreateSRVfromWICFile("assets/pentex/trpen_star.png", device, devicecon, tmp.GetAddressOf(), m_pentexsrv.GetAddressOf());
-	m_pentex["star"].Swap(tmp);
-	CreateSRVfromWICFile("assets/pentex/trpen_uzu.png", device, devicecon, tmp.GetAddressOf(), m_pentexsrv.GetAddressOf());
-	m_pentex["uzu"].Swap(tmp);
-	CreateSRVfromWICFile("assets/pentex/trpen_hart.png", device, devicecon, tmp.GetAddressOf(), m_pentexsrv.GetAddressOf());
-	m_pentex["hart"].Swap(tmp);
+	ComPtr<ID3D11ShaderResourceView> tmpsrv;
+	for (size_t i = 0; i < gtexvalue; i++)
+	{
+		bool isSuccess = CreateSRVfromWICFile(gtexpath[i].c_str(), device, devicecon, tmp.GetAddressOf(), tmpsrv.GetAddressOf());
+		if (!isSuccess)
+		{
+			MessageBox(nullptr, "CreateGraundTexture error", "error", MB_OK);
+			return false;
+		}
+		m_gtex[gtexname[i]].Swap(tmp);
+		m_gtexsrv[gtexname[i]].Swap(tmpsrv);
+	}
 	return false;
 }
 
@@ -628,14 +545,6 @@ void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
 
 }
 
-void GpuTerrain::UpdateEditConstantData(const ConstantEditProperty& _Data)
-{
-	m_constantEditProperty = _Data;
-	auto devicecontext = GetDX11DeviceContext();
-	devicecontext->UpdateSubresource(m_constantEditPropertyBuf.Get(), 0, nullptr, &m_constantEditProperty, 0, 0);
-	devicecontext->CSSetConstantBuffers(11, 1, m_constantEditPropertyBuf.GetAddressOf());
-}
-
 // アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする
 ID3D11Buffer* CreateAndCopyToDebugBuf(ID3D11Device* pD3DDevice, ID3D11DeviceContext* pD3DDeviceContext, ID3D11Buffer* pBuffer)
 {
@@ -727,144 +636,4 @@ void GpuTerrain::CalHeighmapCS()
 	}
 
 	SAFE_RELEASE(debugbuf);
-}
-
-void GpuTerrain::CalCrossPointCS()
-{
-	auto pD3DDeviceContext = GetDX11DeviceContext();
-
-	pD3DDeviceContext->CSSetShader(m_crossComputeShader.Get(), NULL, 0);
-
-	pD3DDeviceContext->CSSetSamplers(0, 1, m_samplerstate.GetAddressOf());
-
-	// シェーダーリソースビューをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetShaderResources(0, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
-
-	// アンオーダードアクセスビューをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, m_crossstrcuturedUAV.GetAddressOf(), NULL);
-
-	// コンピュートシェーダーを実行する。
-	pD3DDeviceContext->Dispatch((UINT)m_div, 1, 1);
-
-	pD3DDeviceContext->CSSetShader(NULL, NULL, 0);
-
-	ID3D11UnorderedAccessView* ppUAViewNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, ppUAViewNULL, NULL);
-
-	ID3D11ShaderResourceView* ppSRVNULL[2] = { NULL, NULL };
-	pD3DDeviceContext->CSSetShaderResources(0, 2, ppSRVNULL);
-
-	ID3D11Buffer* ppCBNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetConstantBuffers(0, 1, ppCBNULL);
-
-	// アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする
-	ID3D11Buffer* debugbuf = CreateAndCopyToDebugBuf(GetDX11Device(), pD3DDeviceContext, m_crossstrcuturedBuf.Get());
-	D3D11_MAPPED_SUBRESOURCE MappedResource;
-	HRESULT hr = pD3DDeviceContext->Map(debugbuf, 0, D3D11_MAP_READ, 0, &MappedResource);
-	if (SUCCEEDED(hr))
-	{
-		Anser* p = reinterpret_cast<Anser*>(MappedResource.pData);
-		for (size_t i = 0; i < 16 * 64 * 2; i++)
-		{
-			crossdata[i] = p[i];
-			if (p[i].factor.x != 0 || p[i].factor.y != 0 || p[i].factor.z != 0)
-			{
-				printf("%f.%f,%f,%f", crossdata[i].factor.x, crossdata[i].factor.y, crossdata[i].factor.z, crossdata[i].factor.w );
-			
-				printf("\n");
-			}
-		
-		}		
-		printf("===\n");
-		pD3DDeviceContext->Unmap(debugbuf, 0);
-	}
-
-	SAFE_RELEASE(debugbuf);
-}
-
-void GpuTerrain::CalEditCS()
-{
-	auto pD3DDeviceContext = GetDX11DeviceContext();
-
-	pD3DDeviceContext->CSSetShader(m_terrainEditComputeShader.Get(), NULL, 0);
-
-	pD3DDeviceContext->CSSetSamplers(0, 1, m_samplerstate.GetAddressOf());
-
-	// SRVをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetShaderResources(0, 1, m_pentexsrv.GetAddressOf());
-	// アンオーダードアクセスビューをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, m_pHeightMapT2DBufUAV.GetAddressOf(), NULL);
-	pD3DDeviceContext->CSSetUnorderedAccessViews(1, 1, m_pNormalAndTexT2DBufUAV.GetAddressOf(), NULL);
-
-	MyEngine::int2 pos;
-	int loopsize = m_heightMapDivSize / m_div;
-	pos.x = m_constantEditProperty.UVAndRangeAndCoef.x - m_constantEditProperty.UVAndRangeAndCoef.z;
-	pos.y = m_constantEditProperty.UVAndRangeAndCoef.y - m_constantEditProperty.UVAndRangeAndCoef.z;
-
-	int step = 0;
-	if (pos.x% loopsize>=1)
-	{
-		step = 1;
-	}
-	pos.x = pos.x / loopsize + step;
-	step = 0;
-	if (pos.y % loopsize >= 1)
-	{
-		step = 1;
-	}
-	pos.y = pos.y / loopsize + step;
-
-
-	MyEngine::int2 pos2;
-	pos2.x = m_constantEditProperty.UVAndRangeAndCoef.x + m_constantEditProperty.UVAndRangeAndCoef.z;
-	pos2.y = m_constantEditProperty.UVAndRangeAndCoef.y + m_constantEditProperty.UVAndRangeAndCoef.z;
-
-	step = 0;
-	if (pos2.x% loopsize>=1)
-	{
-		step = 1;
-	}
-	pos2.x = pos2.x / loopsize + step;
-	step = 0;
-	if (pos2.y % loopsize >= 1)
-	{
-		step = 1;
-	}
-	pos2.y = pos2.y / loopsize + step;
-
-	// ペンサイズを計算しなければ
-	UINT valx = pos2.x - pos.x + 1; 
-	CLAMP_VALUE(valx, 1, 16);
-	UINT valy = pos2.y - pos.y + 1; 
-	CLAMP_VALUE(valy, 1, 16);
-	// コンピュートシェーダーを実行する。
-	pD3DDeviceContext->Dispatch(valx, valy, 1);
-
-	//pD3DDeviceContext->CSSetShader(NULL, NULL, 0);
-
-	pD3DDeviceContext->CSSetShader(NULL, NULL, 0);
-
-	ID3D11UnorderedAccessView* ppUAViewNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, ppUAViewNULL, NULL);
-	pD3DDeviceContext->CSSetUnorderedAccessViews(1, 1, ppUAViewNULL, NULL);
-
-	ID3D11ShaderResourceView* ppSRVNULL[2] = { NULL, NULL };
-	pD3DDeviceContext->CSSetShaderResources(0, 2, ppSRVNULL);
-
-	ID3D11Buffer* ppCBNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetConstantBuffers(0, 1, ppCBNULL);
-
-	// SRVにコピー
-	pD3DDeviceContext->CopyResource(m_pHeightMapT2DSRBuf.Get(), m_pHeightMapT2DUABuf.Get());
-	pD3DDeviceContext->CopyResource(m_pNormalAndTexT2DSRBuf.Get(), m_pNormalAndTexT2DUABuf.Get());
-}
-
-void GpuTerrain::SetPenSRV(std::string _str)
-{
-	auto devcon = GetDX11Device();
-	if (m_pentex.count(_str)==0)
-	{
-		return;
-	}
-	devcon->CreateShaderResourceView(m_pentex[_str].Get(), nullptr, m_pentexsrv.GetAddressOf());
 }

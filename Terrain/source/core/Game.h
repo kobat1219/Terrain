@@ -10,9 +10,12 @@ class Game
 	Game() {/*‹óŽÀ‘•*/ }
 
 	GpuTerrain m_terrain;
-
-	float m_pecz = 0.01f;
 	
+	int m_seed;
+	float m_uvscale = 8;
+
+	float m_texrange[2];
+
 	std::string m_penname;
 
 	MyEngine::float3 m_eye = { 0,50,35 };

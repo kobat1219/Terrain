@@ -1,4 +1,5 @@
-#include	"psvscommon.hlsl"
+#include	"common.hlsl"
+
 
 float4 main( DS_OUTPUT input ) : SV_Target
 {
@@ -20,10 +21,18 @@ float4 main( DS_OUTPUT input ) : SV_Target
 	
 	//col.a = 1;
 	float2 uv=input.uv;
-	uv*=64.0f;
-	//col=g_Tex[0].SampleLevel( g_SamplerLinear,uv,0 );
+    float3 wpos = input.wpos;
+	//uv*=16.0f;
+    col = lerp(g_Tex[0].SampleLevel(g_SamplerLinear, uv, 0),
+			lerp(g_Tex[1].SampleLevel(g_SamplerLinear, uv, 0),
+				g_Tex[2].SampleLevel(g_SamplerLinear, uv, 0),
+					clamp(wpos.y , 0, 1))
+						, clamp((wpos.y+0.5f), 0, 1));
+    //col = g_Tex[1].SampleLevel(g_SamplerLinear, uv, 0);
+    //col = g_Tex[2].SampleLevel(g_SamplerLinear, uv, 0);
 	//col *= diffuse * val;
-	col *=  L;
+    //col *= L;
+    //col *= noise(uv, 0)*10;
 	col.a=1;
 
 	return col;

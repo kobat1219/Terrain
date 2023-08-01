@@ -39,15 +39,26 @@ void Game::Update()
 	// ここから更新
 	// ************************************************************
 
-	static int id = 0;
-	const char* items[] = { "nomal","nomal_set","star","hart","uzu" };
+	//static int id = 0;
+	//const char* items[] = { "nomal","nomal_set","star","hart","uzu" };
 	ImGui::Begin(u8"地形調整");
-	ImGui::DragFloat("size", &m_pecz);
-	if (ImGui::Combo("pen", &id, items, IM_ARRAYSIZE(items)))
+
+	ImGui::Text(u8"シード値");
+	ImGui::InputInt("seed", &m_seed);
+	ImGui::Text(u8"UVスケール値");
+	ImGui::InputFloat("scale", &m_uvscale);
+
+	if (ImGui::Button(u8"地形生成"))
 	{
-		m_penname = items[id];
-		m_terrain.SetPenSRV(m_penname);
+
 	}
+
+	//if (ImGui::Combo("pen", &id, items, IM_ARRAYSIZE(items)))
+	//{
+	//	m_penname = items[id];
+	//	m_terrain.SetPenSRV(m_penname);
+	//}
+
 	ImGui::End();
 
 	ImGui::Begin(u8"テッセレーション調整距離");
@@ -55,6 +66,12 @@ void Game::Update()
 	float len = m_terrain.GetMaxLength();
 	ImGui::SliderFloat("len", &len, 1, 256);
 	m_terrain.SetMaxLength(len);
+
+	ImGui::Text(u8"テクスチャ合成高さ");
+	if (ImGui::DragFloat2("range",m_texrange))
+	{
+
+	}
 
 	ImGui::End();
 
