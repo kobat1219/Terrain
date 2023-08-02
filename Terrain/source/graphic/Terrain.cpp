@@ -15,12 +15,16 @@ void GpuTerrain::Init()
 
 	CreateGraundTexture();
 
+	CreateEditData();
+
 	NewMap();
 
 	CreateHeightmapCS();
 
 	// テクスチャのパッチごとの係数を得る
 	CalHeighmapCS();
+
+	UpdateEditConstantData();
 }
 
 void GpuTerrain::NewMap()
@@ -185,9 +189,45 @@ void GpuTerrain::SetMaxLength(const float& _length)
 	m_maxLength = _length;
 }
 
+void GpuTerrain::SetSeed(const int& _seed)
+{
+	m_constantEditProperty.UVScaleAndSeedAndTexHeight.y = _seed;
+}
+
+void GpuTerrain::SetUVScale(const float& _scale)
+{
+	m_constantEditProperty.UVScaleAndSeedAndTexHeight.x = _scale;
+}
+
+void GpuTerrain::SetTexHeight(const MyEngine::float2& _texh)
+{
+	m_constantEditProperty.UVScaleAndSeedAndTexHeight.z = _texh.x;
+	m_constantEditProperty.UVScaleAndSeedAndTexHeight.w = _texh.y;
+
+	UpdateEditConstantData();
+}
+
 float GpuTerrain::GetMaxLength()
 {
 	return m_maxLength;
+}
+
+int GpuTerrain::GetSeed()
+{
+	return m_constantEditProperty.UVScaleAndSeedAndTexHeight.y;
+}
+
+float GpuTerrain::GetUVScale()
+{
+	return m_constantEditProperty.UVScaleAndSeedAndTexHeight.x;
+}
+
+MyEngine::float2 GpuTerrain::GetTexHeight()
+{
+	return MyEngine::float2(
+		m_constantEditProperty.UVScaleAndSeedAndTexHeight.z,
+		m_constantEditProperty.UVScaleAndSeedAndTexHeight.w
+	);
 }
 
 bool GpuTerrain::CreateIndexAndVertexBuffer()
@@ -422,6 +462,22 @@ bool GpuTerrain::CreateGraundTexture()
 	return false;
 }
 
+bool GpuTerrain::CreateEditData()
+{
+	auto device = GetDX11Device();
+	// コンスタントバッファ作成
+	bool sts = CreateConstantBuffer(
+		device,			// デバイス
+		sizeof(ConstantEditProperty),	// サイズ
+		&m_constantEditPropertyBuf);			// コンスタントバッファ２
+	if (!sts) {
+		MessageBox(NULL, "CreateBuffer(constant buffer world) error", "Error", MB_OK);
+		return false;
+	}
+
+	return true;
+}
+
 void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
 {
 	using namespace MyEngine;
@@ -543,6 +599,14 @@ void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
 	ID3D11DeviceContext* devicecontext = DirectXGraphics::GetInstance()->GetImmediateContext();
 	devicecontext->UpdateSubresource(m_factorStructBuffer.Get(), 0, nullptr, m_factor.data(), 0, 0);
 
+}
+
+void GpuTerrain::UpdateEditConstantData()
+{
+	auto devicecontext = GetDX11DeviceContext();
+	devicecontext->UpdateSubresource(m_constantEditPropertyBuf.Get(), 0, nullptr, &m_constantEditProperty, 0, 0);
+	devicecontext->PSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
+	devicecontext->DSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
 }
 
 // アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする

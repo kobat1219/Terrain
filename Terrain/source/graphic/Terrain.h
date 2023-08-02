@@ -19,10 +19,17 @@ public:
     void Init();
     void NewMap();
     void Draw(const MyEngine::float3& _camerapos);
+    void UpdateEditConstantData();
 
     void SetMaxLength(const float& _length);
-    float GetMaxLength();
+    void SetSeed(const int& _seed);
+    void SetUVScale(const float& _scale);
+    void SetTexHeight(const MyEngine::float2& _texh);
 
+    float               GetMaxLength();
+    int                 GetSeed();
+    float               GetUVScale();
+    MyEngine::float2    GetTexHeight();
 protected:
 
     //-----------------------------------------------------------------
@@ -93,10 +100,8 @@ protected:
 
     struct ConstantEditProperty
     {
-        // xy:uv z:range w:係数
-        XMFLOAT4 UVAndSeedAndCoef;
-        // セットするID x:テクスチャID y:TypeID 
-        XMFLOAT4 SetId;
+        // x:uvscale y:seed zw:texheight
+        XMFLOAT4 UVScaleAndSeedAndTexHeight = { 1,0,-1.5f,0.5f };
     };
 
     ConstantEditProperty m_constantEditProperty;
@@ -124,6 +129,7 @@ protected:
     bool CreateShader();
     bool CreateCSUseSampler();
     bool CreateGraundTexture();
+    bool CreateEditData();
     void UpdateFactor(const MyEngine::float3& _camerapos);
     void CalHeighmapCS();
 
@@ -131,13 +137,13 @@ protected:
 
     const std::vector<std::string> gtexname = 
     {
-        "rock",
+        "sand",
         "moss",
         "snow"
     };
     const std::vector<std::string> gtexpath = 
     {
-        "assets/gtex/rock.png",
+        "assets/gtex/sand.png",
         "assets/gtex/moss.png",
         "assets/gtex/snow.png"
     };

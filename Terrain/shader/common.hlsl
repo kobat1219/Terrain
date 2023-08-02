@@ -19,11 +19,9 @@ cbuffer ConstantBufferProjection : register(b2)
 	matrix Projection;
 }
 
-cbuffer ConstantBufferMaterial : register(b3)
+cbuffer ConstantBufferEditProperty : register(b3)
 {
-	float4	ambientMaterial;
-	float4	diffuseMaterial;
-	float4	specularMaterial;
+    float4 EditProperty;
 }
 
 cbuffer ConstantBufferLight : register(b4)

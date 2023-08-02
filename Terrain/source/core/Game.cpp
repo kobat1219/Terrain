@@ -43,21 +43,29 @@ void Game::Update()
 	//const char* items[] = { "nomal","nomal_set","star","hart","uzu" };
 	ImGui::Begin(u8"地形調整");
 
+	m_seed = m_terrain.GetSeed();
 	ImGui::Text(u8"シード値");
-	ImGui::InputInt("seed", &m_seed);
+	ImGui::SameLine();
+	if (ImGui::Button(u8"ランダムシード"))
+	{
+		m_terrain.SetSeed(rand());
+	}
+	if (ImGui::InputInt("seed", &m_seed)) 
+	{
+		m_terrain.SetSeed(m_seed);
+	}
+
+	m_uvscale = m_terrain.GetUVScale();
 	ImGui::Text(u8"UVスケール値");
-	ImGui::InputFloat("scale", &m_uvscale);
+	if (ImGui::DragFloat("scale", &m_uvscale)) 
+	{
+		m_terrain.SetUVScale(m_uvscale);
+	}
 
 	if (ImGui::Button(u8"地形生成"))
 	{
-
+		m_terrain.UpdateEditConstantData();
 	}
-
-	//if (ImGui::Combo("pen", &id, items, IM_ARRAYSIZE(items)))
-	//{
-	//	m_penname = items[id];
-	//	m_terrain.SetPenSRV(m_penname);
-	//}
 
 	ImGui::End();
 
@@ -67,10 +75,13 @@ void Game::Update()
 	ImGui::SliderFloat("len", &len, 1, 256);
 	m_terrain.SetMaxLength(len);
 
-	ImGui::Text(u8"テクスチャ合成高さ");
-	if (ImGui::DragFloat2("range",m_texrange))
-	{
+	m_texrange[0]=m_terrain.GetTexHeight().x;
+	m_texrange[1]=m_terrain.GetTexHeight().y;
 
+	ImGui::Text(u8"テクスチャ合成高さ");
+	if (ImGui::DragFloat2("range", m_texrange, 0.1f))
+	{
+		m_terrain.SetTexHeight({ m_texrange[0], m_texrange[1]});
 	}
 
 	ImGui::End();

@@ -46,7 +46,7 @@ DS_OUTPUT DS( HS_CONSTANT_OUTPUT In, float2 UV : SV_DomaInLocation, const Output
 	
 	Out.pos = float4(lerp(top_u, bottom_u, UV.y), 1);
 	
-    Out.pos.y += noise(uv, 0)*2;
+    Out.pos.y += noise(uv*EditProperty.x, EditProperty.y)*5;
 	
     Out.wpos = Out.pos;
 	
