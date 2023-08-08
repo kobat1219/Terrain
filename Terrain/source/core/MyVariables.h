@@ -562,24 +562,5 @@ namespace MyEngine {
 			}
 
 		};
-
-		struct line 
-		{
-			float3 p;	// ポイント
-			float3 vec;	// ベクトル
-
-			line():p(0,0,0),vec(1,0,0) {}
-			line(const float3& _p, const float3& _v) :p(_p), vec(_v) {}
-		};
-
-		struct PLANE {
-			float a, b, c, d;
-		};
-
-		struct PLANEINFO {
-			PLANE plane;
-			float3 p1, p2, p3;
-			unsigned int i1, i2, i3;
-		};
 	}
 }

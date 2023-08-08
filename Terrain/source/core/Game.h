@@ -9,7 +9,7 @@ class Game
 {
 	Game() {/*‹óÀ‘•*/ }
 
-	GpuTerrain m_terrain;
+	Terrain m_terrain;
 	
 	int m_seed;
 	float m_uvscale = 8;

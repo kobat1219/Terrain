@@ -114,9 +114,6 @@
     <ClCompile Include="source\graphic\Shader.cpp">
       <Filter>見なくていい\ソース ファイル\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="source\graphic\ShaderBank.cpp">
-      <Filter>見なくていい\ソース ファイル\Graphic</Filter>
-    </ClCompile>
     <ClCompile Include="source\core\Game.cpp">
       <Filter>見なくていい\ソース ファイル\Core</Filter>
     </ClCompile>
@@ -191,9 +188,6 @@
     <ClInclude Include="source\graphic\Shader.h">
       <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="source\graphic\ShaderBank.h">
-      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
-    </ClInclude>
     <ClInclude Include="source\graphic\Light.h">
       <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
     </ClInclude>
@@ -230,6 +224,9 @@
       <Filter>本題\シェーダーファイル</Filter>
     </FxCompile>
     <FxCompile Include="shader\vsterrain.hlsl">
+      <Filter>本題\シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="shader\csterrainremake.hlsl">
       <Filter>本題\シェーダーファイル</Filter>
     </FxCompile>
   </ItemGroup>

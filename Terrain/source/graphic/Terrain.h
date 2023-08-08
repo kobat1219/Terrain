@@ -4,75 +4,45 @@
 #include	<wrl/client.h>
 #include	<d3d11.h>
 #include	<vector>
+#include    <unordered_map>
 #include    "../core/MyVariables.h"
 #include	"../directx/DX11Util.h"
 #include	"Shader.h"
-#include	"ShaderBank.h"
 
 using Microsoft::WRL::ComPtr;
 
-constexpr UINT NUM_ELEMENTS = 128;
-
-class GpuTerrain
+class Terrain
 {
 public:
     void Init();
     void NewMap();
     void Draw(const MyEngine::float3& _camerapos);
     void UpdateEditConstantData();
+    void CalNewMapCS();
 
+    // setter
     void SetMaxLength(const float& _length);
     void SetSeed(const int& _seed);
     void SetUVScale(const float& _scale);
     void SetTexHeight(const MyEngine::float2& _texh);
 
+    // getter
     float               GetMaxLength();
     int                 GetSeed();
     float               GetUVScale();
     MyEngine::float2    GetTexHeight();
-protected:
 
-    //-----------------------------------------------------------------
-    
-    // 高さマップ
-#ifdef USE_WICTEX
-    ComPtr<ID3D11Resource> m_pHeightMapT2DBuf;
-#else
-    ComPtr<ID3D11Texture2D> m_pHeightMapT2DSRBuf;
-    ComPtr<ID3D11Texture2D> m_pHeightMapT2DUABuf;
-    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DSRBuf;
-    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DUABuf;
-#endif // USE_WICTEX
+private:
+    bool CreateIndexAndVertexBuffer();
+    bool CreateNewMapCS();
+    bool CreateShader();
+    bool CreateCSUseSampler();
+    bool CreateGraundTexture();
+    bool CreateConstantBufferEditData();
+    void UpdateFactor(const MyEngine::float3& _camerapos);
 
-    // 高さマップSRV
-    ComPtr<ID3D11ShaderResourceView> m_pHeightMapT2DBufSRV;
-    ComPtr<ID3D11UnorderedAccessView> m_pHeightMapT2DBufUAV;
-
-    ComPtr<ID3D11ShaderResourceView> m_pNormalAndTexT2DBufSRV;
-    ComPtr<ID3D11UnorderedAccessView> m_pNormalAndTexT2DBufUAV;
-
-    UINT m_heightMapDivSize = 1024;
-    //-----------------------------------------------------------------
-
-    // 頂点データ
-    struct Vertex {
-        DirectX::XMFLOAT3	Pos;
-        
-        DirectX::XMFLOAT2	Uv;
-    };
-
-    std::vector<Vertex>	m_vertex;			//　頂点データ
-    ComPtr<ID3D11Buffer> m_vertexBuffer;
-
-    //--------------------------------------------------------------------------
-    struct DivFactor {
-        float factor[4];
-        float inside[4];
-    };
-    std::vector<DivFactor>	m_factor;			//　分割数計算値用のバッファ
-    ComPtr<ID3D11Buffer> m_factorStructBuffer;
-    ComPtr<ID3D11ShaderResourceView> m_factorStructBufferSRV;
-    //--------------------------------------------------------------------------
+private: // variables
+    //--Shader------------------------------------------------------------------------
     
     // 頂点シェーダ
     ComPtr<ID3D11VertexShader> m_vertexShader;
@@ -87,17 +57,20 @@ protected:
     // ピクセル
     ComPtr<ID3D11PixelShader> m_pixelShader;
 
-    //---------------------------------------------------------------
-    // 高さマップのパッチごとの値を得るCS
-    ComPtr<ID3D11ComputeShader> m_heightComputeShader;
+    //--VertexBuffer---------------------------------------------------------------
 
-    struct Anser {
-        XMFLOAT4 factor;
+    // 頂点データ
+    struct Vertex 
+    {
+        DirectX::XMFLOAT3	Pos;
+        DirectX::XMFLOAT2	Uv;
     };
 
-    Anser getdata[16 * 16];
-    Anser crossdata[16 * 64 * 2];
+    std::vector<Vertex>	m_vertex;			//　頂点データ
+    ComPtr<ID3D11Buffer> m_vertexBuffer;
 
+    //--ConstantDataBuffer-------------------------------------------------------------
+ 
     struct ConstantEditProperty
     {
         // x:uvscale y:seed zw:texheight
@@ -107,31 +80,39 @@ protected:
     ConstantEditProperty m_constantEditProperty;
     ComPtr<ID3D11Buffer> m_constantEditPropertyBuf;
 
+    //--DivisionFactorBuffer------------------------------------------------------------------------
+    
+    struct DivFactor {
+        float factor[4];
+        float inside[4];    // float*4でないといけない。
+    };
+    std::vector<DivFactor>	m_factor;			//　分割数計算値用のバッファ
+    ComPtr<ID3D11Buffer> m_factorStructBuffer;
+    ComPtr<ID3D11ShaderResourceView> m_factorStructBufferSRV;
 
-    ComPtr<ID3D11Buffer> m_ansstrcuturedBuf;
-    ComPtr<ID3D11UnorderedAccessView> m_ansstrcuturedUAV;
+    //--MapTextureResource---------------------------------------------------------------
+    
+    // 高さマップ
+    ComPtr<ID3D11Texture2D> m_pHeightMapT2DSRBuf;
+    ComPtr<ID3D11Texture2D> m_pHeightMapT2DUABuf;
+    // 法線マップ
+    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DSRBuf;
+    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DUABuf;
 
-    ComPtr<ID3D11SamplerState>m_samplerstate;
+    // 高さマップSRV,UAV
+    ComPtr<ID3D11ShaderResourceView> m_pHeightMapT2DBufSRV;
+    ComPtr<ID3D11UnorderedAccessView> m_pHeightMapT2DBufUAV;
+    // 法線マップSRV,UAV
+    ComPtr<ID3D11ShaderResourceView> m_pNormalAndTexT2DBufSRV;
+    ComPtr<ID3D11UnorderedAccessView> m_pNormalAndTexT2DBufUAV;
 
-    std::unordered_map<std::string,ComPtr<ID3D11Resource>> m_gtex;
+    // マップテクスチャ幅 1024*1024px
+    UINT m_MapTextureDivSize = 1024;
+
+    //--GraundTextureResource-------------------------------------------------------------
+
+    std::unordered_map<std::string, ComPtr<ID3D11Resource>> m_gtex;
     std::unordered_map<std::string, ComPtr<ID3D11ShaderResourceView>> m_gtexsrv;
-
-    // 2の乗数
-    float m_div = 16;
-    float m_divsize = 2;
-
-    float m_minLength = 0.5f;
-    float m_maxLength = 85.0f;
-
-    float m_uvscale = 8;
-    bool CreateIndexAndVertexBuffer();
-    bool CreateHeightmapCS();
-    bool CreateShader();
-    bool CreateCSUseSampler();
-    bool CreateGraundTexture();
-    bool CreateEditData();
-    void UpdateFactor(const MyEngine::float3& _camerapos);
-    void CalHeighmapCS();
 
     const int gtexvalue = 3;
 
@@ -147,5 +128,22 @@ protected:
         "assets/gtex/moss.png",
         "assets/gtex/snow.png"
     };
+
+    //--ComputeShader-------------------------------------------------------------
+    // 高さマップのパッチごとの値を得るCS
+    ComPtr<ID3D11ComputeShader> m_newmapComputeShader;
+
+    // ComputeShader用のサンプラー
+    ComPtr<ID3D11SamplerState>m_samplerstate;
+
+    //--Parameta-------------------------------------------------------------
+
+    // 2の乗数
+    float m_div = 16;
+    float m_divsize = 2;
+
+    float m_minLength = 0.5f;
+    float m_maxLength = 85.0f;
+
 };
 

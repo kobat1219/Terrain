@@ -321,7 +321,7 @@ bool DirectXGraphics::Init(HWND hWnd, unsigned int Width, unsigned int Height, b
 	// サンプラーステート設定
 	D3D11_SAMPLER_DESC smpDesc;
 	ZeroMemory(&smpDesc, sizeof(smpDesc));
-	smpDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	smpDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	smpDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	smpDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	smpDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;

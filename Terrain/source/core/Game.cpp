@@ -65,6 +65,13 @@ void Game::Update()
 	if (ImGui::Button(u8"地形生成"))
 	{
 		m_terrain.UpdateEditConstantData();
+		m_terrain.CalNewMapCS();
+	}
+
+	ImGui::Text(u8"テクスチャ合成高さ");
+	if (ImGui::DragFloat2("range", m_texrange, 0.1f))
+	{
+		m_terrain.SetTexHeight({ m_texrange[0], m_texrange[1]});
 	}
 
 	ImGui::End();
@@ -78,11 +85,6 @@ void Game::Update()
 	m_texrange[0]=m_terrain.GetTexHeight().x;
 	m_texrange[1]=m_terrain.GetTexHeight().y;
 
-	ImGui::Text(u8"テクスチャ合成高さ");
-	if (ImGui::DragFloat2("range", m_texrange, 0.1f))
-	{
-		m_terrain.SetTexHeight({ m_texrange[0], m_texrange[1]});
-	}
 
 	ImGui::End();
 

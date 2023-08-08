@@ -71,20 +71,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Terrain\Terrain\Terrain\package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Terrain\Terrain\Terrain\package\directxtex\lib\x86\debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\x86\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Terrain\Terrain\Terrain\package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Terrain\Terrain\Terrain\package\directxtex\lib\x64\debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\x64\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Terrain\Terrain\Terrain\package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Terrain\Terrain\Terrain\package\directxtex\lib\x86\release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\x86\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Terrain\Terrain\Terrain\package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Terrain\Terrain\Terrain\package\directxtex\lib\x64\release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\x64\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,7 +159,6 @@
     <ClCompile Include="source\directx\DX11Util.cpp" />
     <ClCompile Include="source\directx\WICTextureLoader.cpp" />
     <ClCompile Include="source\graphic\Shader.cpp" />
-    <ClCompile Include="source\graphic\ShaderBank.cpp" />
     <ClCompile Include="source\graphic\Terrain.cpp" />
     <ClCompile Include="source\imgui_dx11\imgui.cpp" />
     <ClCompile Include="source\imgui_dx11\ImGuiManager.cpp" />
@@ -187,7 +186,6 @@
     <ClInclude Include="source\directx\DX11Util.h" />
     <ClInclude Include="source\graphic\Light.h" />
     <ClInclude Include="source\graphic\Shader.h" />
-    <ClInclude Include="source\graphic\ShaderBank.h" />
     <ClInclude Include="source\graphic\Terrain.h" />
     <ClInclude Include="source\imgui_dx11\imconfig.h" />
     <ClInclude Include="source\imgui_dx11\imgui.h" />
@@ -208,6 +206,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="shader\csterrainremake.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="shader\csterrainupdate.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

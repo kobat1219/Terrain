@@ -1,7 +1,7 @@
 #include	"common.hlsl"
 
 
-float4 main( DS_OUTPUT input ) : SV_Target
+float4 PS( DS_OUTPUT input ) : SV_Target
 {
 	
 	//float4 diffuse = max(0.5, abs(sin(input.pos.y*2+0.5f))+0.2f)/*= diffuseMaterial * d*/;
@@ -20,7 +20,8 @@ float4 main( DS_OUTPUT input ) : SV_Target
 	//(g_Tex[2].Sample(g_SamplerLinear,input.Tex)*input.Color.r)+(g_Tex[1].Sample(g_SamplerLinear,input.Tex)*input.Color.g)+(g_Tex[0].Sample(g_SamplerLinear,input.Tex)*input.Color.b);
 	
 	//col.a = 1;
-	float2 uv=input.uv;
+    float2 uv = input.uv * EditProperty.x;
+
     float3 wpos = input.wpos;
 	//uv*=16.0f;
     col = lerp(g_Tex[0].SampleLevel(g_SamplerLinear, uv, 0),

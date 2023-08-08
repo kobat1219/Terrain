@@ -5,7 +5,9 @@
 #include <mutex>
 #include <thread>
 
-void GpuTerrain::Init()
+#pragma region Public Method
+
+void Terrain::Init()
 {
 	CreateIndexAndVertexBuffer();
 	
@@ -15,24 +17,21 @@ void GpuTerrain::Init()
 
 	CreateGraundTexture();
 
-	CreateEditData();
+	CreateConstantBufferEditData();
 
 	NewMap();
 
-	CreateHeightmapCS();
-
-	// テクスチャのパッチごとの係数を得る
-	CalHeighmapCS();
+	CreateNewMapCS();
 
 	UpdateEditConstantData();
 }
 
-void GpuTerrain::NewMap()
+void Terrain::NewMap()
 {
 	D3D11_TEXTURE2D_DESC descuav;
 	ZeroMemory(&descuav, sizeof(D3D11_TEXTURE2D_DESC));
-	descuav.Width = m_heightMapDivSize;
-	descuav.Height = m_heightMapDivSize;
+	descuav.Width = m_MapTextureDivSize;
+	descuav.Height = m_MapTextureDivSize;
 	descuav.MipLevels = 1;
 	descuav.ArraySize = 1;
 	descuav.Format = DXGI_FORMAT_R32_FLOAT;
@@ -45,8 +44,8 @@ void GpuTerrain::NewMap()
 
 	D3D11_TEXTURE2D_DESC descsrv;
 	ZeroMemory(&descsrv, sizeof(D3D11_TEXTURE2D_DESC));
-	descsrv.Width = m_heightMapDivSize;
-	descsrv.Height = m_heightMapDivSize;
+	descsrv.Width = m_MapTextureDivSize;
+	descsrv.Height = m_MapTextureDivSize;
 	descsrv.MipLevels = 1;
 	descsrv.ArraySize = 1;
 	descsrv.Format = DXGI_FORMAT_R32_FLOAT;
@@ -72,13 +71,6 @@ void GpuTerrain::NewMap()
 		&m_pHeightMapT2DSRBuf);// 作成したテクスチャを受け取る変数
 	if (FAILED(hr))
 		MessageBox(nullptr, "CreateTexture error", "Error", MB_OK);
-
-
-	//hr = GetDX11DeviceContext()->Map(m_pHeightMapT2DBuf.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &pData);
-	//if (SUCCEEDED(hr)) {
-	//	memcpy_s(pData.pData, pData.DepthPitch, (void*)(m_HeightMapBuffer.data()), sizeof(float) * m_heightMapDivSize*m_heightMapDivSize);
-	//	GetDX11DeviceContext()->Unmap(m_pHeightMapT2DBuf.Get(), 0);
-	//}
 
 	//シェーダ リソース ビューの作成する為の情報をセット
 	D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
@@ -123,13 +115,6 @@ void GpuTerrain::NewMap()
 	if (FAILED(hr))
 		MessageBox(nullptr, "CreateTexture error", "Error", MB_OK);
 
-
-	//hr = GetDX11DeviceContext()->Map(m_pHeightMapT2DBuf.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &pData);
-	//if (SUCCEEDED(hr)) {
-	//	memcpy_s(pData.pData, pData.DepthPitch, (void*)(m_HeightMapBuffer.data()), sizeof(float) * m_heightMapDivSize*m_heightMapDivSize);
-	//	GetDX11DeviceContext()->Unmap(m_pHeightMapT2DBuf.Get(), 0);
-	//}
-
 	// シェーダ リソース ビューの生成
 	hr = device->CreateShaderResourceView(
 		m_pNormalAndTexT2DSRBuf.Get(),	// アクセスするテクスチャ リソース
@@ -145,7 +130,7 @@ void GpuTerrain::NewMap()
 	}
 }
 
-void GpuTerrain::Draw(const MyEngine::float3& _camerapos)
+void Terrain::Draw(const MyEngine::float3& _camerapos)
 {
 	UpdateFactor(_camerapos);
 	auto device = GetDX11DeviceContext();
@@ -155,8 +140,8 @@ void GpuTerrain::Draw(const MyEngine::float3& _camerapos)
 	unsigned  offset = 0;
 	device->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
 
-	device->DSSetShaderResources(0, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
-	device->DSSetShaderResources(1, 1, m_pNormalAndTexT2DBufSRV.GetAddressOf());
+	device->DSSetShaderResources(3, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
+	device->DSSetShaderResources(4, 1, m_pNormalAndTexT2DBufSRV.GetAddressOf());
 	device->HSSetShaderResources(10, 1, m_factorStructBufferSRV.GetAddressOf());
 
 	for (size_t i = 0; i < gtexvalue; i++)
@@ -184,22 +169,34 @@ void GpuTerrain::Draw(const MyEngine::float3& _camerapos)
 	device->DSSetShader(nullptr, nullptr, 0);			// りセット
 }
 
-void GpuTerrain::SetMaxLength(const float& _length)
+void Terrain::UpdateEditConstantData()
+{
+	auto devicecontext = GetDX11DeviceContext();
+	devicecontext->UpdateSubresource(m_constantEditPropertyBuf.Get(), 0, nullptr, &m_constantEditProperty, 0, 0);
+	devicecontext->PSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
+	devicecontext->DSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
+}
+
+#pragma endregion
+
+#pragma region GetterSetter
+
+void Terrain::SetMaxLength(const float& _length)
 {
 	m_maxLength = _length;
 }
 
-void GpuTerrain::SetSeed(const int& _seed)
+void Terrain::SetSeed(const int& _seed)
 {
 	m_constantEditProperty.UVScaleAndSeedAndTexHeight.y = _seed;
 }
 
-void GpuTerrain::SetUVScale(const float& _scale)
+void Terrain::SetUVScale(const float& _scale)
 {
 	m_constantEditProperty.UVScaleAndSeedAndTexHeight.x = _scale;
 }
 
-void GpuTerrain::SetTexHeight(const MyEngine::float2& _texh)
+void Terrain::SetTexHeight(const MyEngine::float2& _texh)
 {
 	m_constantEditProperty.UVScaleAndSeedAndTexHeight.z = _texh.x;
 	m_constantEditProperty.UVScaleAndSeedAndTexHeight.w = _texh.y;
@@ -207,22 +204,22 @@ void GpuTerrain::SetTexHeight(const MyEngine::float2& _texh)
 	UpdateEditConstantData();
 }
 
-float GpuTerrain::GetMaxLength()
+float Terrain::GetMaxLength()
 {
 	return m_maxLength;
 }
 
-int GpuTerrain::GetSeed()
+int Terrain::GetSeed()
 {
 	return m_constantEditProperty.UVScaleAndSeedAndTexHeight.y;
 }
 
-float GpuTerrain::GetUVScale()
+float Terrain::GetUVScale()
 {
 	return m_constantEditProperty.UVScaleAndSeedAndTexHeight.x;
 }
 
-MyEngine::float2 GpuTerrain::GetTexHeight()
+MyEngine::float2 Terrain::GetTexHeight()
 {
 	return MyEngine::float2(
 		m_constantEditProperty.UVScaleAndSeedAndTexHeight.z,
@@ -230,7 +227,11 @@ MyEngine::float2 GpuTerrain::GetTexHeight()
 	);
 }
 
-bool GpuTerrain::CreateIndexAndVertexBuffer()
+#pragma endregion
+
+#pragma region Private Method
+
+bool Terrain::CreateIndexAndVertexBuffer()
 {
 	m_vertex.clear();
 	for (unsigned int z = 0; z < m_div; z++)
@@ -240,22 +241,22 @@ bool GpuTerrain::CreateIndexAndVertexBuffer()
 			Vertex v;
 			printf("--\n");
 			v.Pos = { -((m_div/2) * m_divsize) + x * m_divsize, 0, -((m_div / 2) * m_divsize) + (z+1) * m_divsize };
-			v.Uv = { (float)x* m_uvscale / (float)m_div, (float)(z * m_uvscale + m_uvscale) / (float)m_div};
+			v.Uv = { (float)x / (float)m_div, (float)(z + 1) / (float)m_div};
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + (x+1) * m_divsize, 0, -((m_div / 2) * m_divsize) + (z+1) * m_divsize };
-			v.Uv = { (float)(x * m_uvscale + m_uvscale) / (float)m_div, (float)(z * m_uvscale + m_uvscale) / (float)m_div};
+			v.Uv = { (float)(x + 1) / (float)m_div, (float)(z + 1) / (float)m_div};
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + (x + 1) * m_divsize, 0, -((m_div / 2) * m_divsize) + z * m_divsize };
-			v.Uv = { (float)(x * m_uvscale + m_uvscale) / (float)m_div, (float)z * m_uvscale / (float)m_div };
+			v.Uv = { (float)(x + 1) / (float)m_div, (float)z / (float)m_div };
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 			
 			v.Pos = { -((m_div / 2) * m_divsize) + x * m_divsize, 0, -((m_div / 2) * m_divsize) + z * m_divsize };
-			v.Uv = { (float)x * m_uvscale / (float)m_div, (float)z * m_uvscale / (float)m_div };
+			v.Uv = { (float)x / (float)m_div, (float)z / (float)m_div };
 			printf("%f,%f\n", v.Uv.x, v.Uv.y);
 			m_vertex.emplace_back(v);
 
@@ -303,46 +304,25 @@ bool GpuTerrain::CreateIndexAndVertexBuffer()
 	return true;
 }
 
-bool GpuTerrain::CreateHeightmapCS()
+bool Terrain::CreateNewMapCS()
 {
 	auto device = GetDX11Device();
 	bool sts = CreateComputeShader(
 		device,
-		"shader/csheightfactercal.hlsl",
+		"shader/csterrainremake.hlsl",
 		"CS_Main",
 		"cs_5_0",
-		&m_heightComputeShader);
+		&m_newmapComputeShader);
 
 	if (!sts) {
 		MessageBox(nullptr, "CreateComputeShader error", "error", MB_OK);
 		return false;
 	}
-	// コンピュートシェーダーへの入力時に使用するシェーダーリソースビューを作成する
-	sts = CreateStructuredBuffer(
-		device,
-		sizeof(Anser),
-		16 * 16,
-		&getdata[0],
-		&m_ansstrcuturedBuf);
-	if (sts == false)
-	{
-		MessageBox(nullptr, "CPSHADERERROR", "ERROR", MB_OK);
-		return false;
-	}
-
-	// コンピュートシェーダーからの出力時に使用するアンオーダードアクセスビューを作成する
-	sts = CreateUnOrderAccessView(device, m_ansstrcuturedBuf.Get(), &m_ansstrcuturedUAV);
-	if (sts == false)
-	{
-		MessageBox(nullptr, "CPSHADERERROR", "ERROR", MB_OK);
-		return false;
-	}
-
 
 	return true;
 }
 
-bool GpuTerrain::CreateShader()
+bool Terrain::CreateShader()
 {
 	auto dev = GetDX11Device();
 
@@ -358,7 +338,7 @@ bool GpuTerrain::CreateShader()
 	bool sts = CreateVertexShader(
 		dev,
 		"shader/vsterrain.hlsl",
-		"main",
+		"VS",
 		"vs_5_0",
 		layout,
 		numElements,
@@ -381,6 +361,7 @@ bool GpuTerrain::CreateShader()
 		MessageBox(nullptr, "CreateShader error", "error", MB_OK);
 		return false;
 	}
+
 	sts = CreateDomainShader(
 		dev,
 		"shader/dsterrain.hlsl",
@@ -392,10 +373,11 @@ bool GpuTerrain::CreateShader()
 		MessageBox(nullptr, "CreateShader error", "error", MB_OK);
 		return false;
 	}
+
 	sts = CreatePixelShader(
 		dev,
 		"shader/psterrain.hlsl",
-		"main",
+		"PS",
 		"ps_5_0",
 		&m_pixelShader
 	);
@@ -405,17 +387,18 @@ bool GpuTerrain::CreateShader()
 		return false;
 	}
 
-	
-
 	return true;
 }
 
-bool GpuTerrain::CreateCSUseSampler()
+bool Terrain::CreateCSUseSampler()
 {
 	// サンプラーステート設定
 	D3D11_SAMPLER_DESC smpDesc;
 	ZeroMemory(&smpDesc, sizeof(smpDesc));
 	smpDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	smpDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	smpDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	smpDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	//smpDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	//smpDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	//smpDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -425,9 +408,6 @@ bool GpuTerrain::CreateCSUseSampler()
 	//smpDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 	//smpDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
 	//smpDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-	smpDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	smpDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	smpDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	//	smpDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	//	smpDesc.MinLOD = 0;
 	//	smpDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -442,7 +422,7 @@ bool GpuTerrain::CreateCSUseSampler()
 	return true;
 }
 
-bool GpuTerrain::CreateGraundTexture()
+bool Terrain::CreateGraundTexture()
 {
 	auto device = GetDX11Device();
 	auto devicecon = GetDX11DeviceContext();
@@ -459,10 +439,10 @@ bool GpuTerrain::CreateGraundTexture()
 		m_gtex[gtexname[i]].Swap(tmp);
 		m_gtexsrv[gtexname[i]].Swap(tmpsrv);
 	}
-	return false;
+	return true;
 }
 
-bool GpuTerrain::CreateEditData()
+bool Terrain::CreateConstantBufferEditData()
 {
 	auto device = GetDX11Device();
 	// コンスタントバッファ作成
@@ -478,7 +458,7 @@ bool GpuTerrain::CreateEditData()
 	return true;
 }
 
-void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
+void Terrain::UpdateFactor(const MyEngine::float3& _camerapos)
 {
 	using namespace MyEngine;
 	UINT cnt = 0;
@@ -526,16 +506,8 @@ void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
 			{
 				distance = 2;
 			}
-			float sn = 0;
 
-			if (getdata[cnt].factor.w!=0)
-			{
-				sn= (1.0f / (float)m_heightMapDivSize) / getdata[cnt].factor.w; // sin値
-			}
-			else if(getdata[cnt].factor.y== getdata[cnt].factor.z)
-			{
-				distance /= 2;
-			}
+			distance /= 2;
 
 			// 係数を一時配列に入れる
 			tmpbuf.emplace_back(distance);
@@ -601,103 +573,25 @@ void GpuTerrain::UpdateFactor(const MyEngine::float3& _camerapos)
 
 }
 
-void GpuTerrain::UpdateEditConstantData()
-{
-	auto devicecontext = GetDX11DeviceContext();
-	devicecontext->UpdateSubresource(m_constantEditPropertyBuf.Get(), 0, nullptr, &m_constantEditProperty, 0, 0);
-	devicecontext->PSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
-	devicecontext->DSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
-}
-
-// アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする
-ID3D11Buffer* CreateAndCopyToDebugBuf(ID3D11Device* pD3DDevice, ID3D11DeviceContext* pD3DDeviceContext, ID3D11Buffer* pBuffer)
-{
-	ID3D11Buffer* debugbuf = NULL;
-
-	D3D11_BUFFER_DESC BufferDesc;
-	ZeroMemory(&BufferDesc, sizeof(D3D11_BUFFER_DESC));
-	pBuffer->GetDesc(&BufferDesc);
-	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;  // CPU から読み込みできるように設定する
-	BufferDesc.Usage = D3D11_USAGE_STAGING;             // GPU から CPU へのデータ転送 (コピー) をサポートするリソース
-	BufferDesc.BindFlags = 0;
-	BufferDesc.MiscFlags = 0;
-	if (FAILED(pD3DDevice->CreateBuffer(&BufferDesc, NULL, &debugbuf)))
-		goto EXIT;
-
-	pD3DDeviceContext->CopyResource(debugbuf, pBuffer);
-
-EXIT:
-	return debugbuf;
-}
-// アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする
-ID3D11Texture2D* CreateAndCopyToDebugBufTexture2D(ID3D11Device* pD3DDevice, ID3D11DeviceContext* pD3DDeviceContext, ID3D11Texture2D* pBuffer)
-{
-	ID3D11Texture2D* debugbuf = NULL;
-
-	D3D11_TEXTURE2D_DESC BufferDesc;
-	ZeroMemory(&BufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-	pBuffer->GetDesc(&BufferDesc);
-	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;  // CPU から読み込みできるように設定する
-	BufferDesc.Usage = D3D11_USAGE_STAGING;             // GPU から CPU へのデータ転送 (コピー) をサポートするリソース
-	BufferDesc.BindFlags = 0;
-	BufferDesc.MiscFlags = 0;
-	if (FAILED(pD3DDevice->CreateTexture2D(&BufferDesc, NULL, &debugbuf)))
-		goto EXIT;
-
-	pD3DDeviceContext->CopyResource(debugbuf, pBuffer);
-
-EXIT:
-	return debugbuf;
-}
-
-void GpuTerrain::CalHeighmapCS()
+void Terrain::CalNewMapCS()
 {
 	auto pD3DDeviceContext = GetDX11DeviceContext();
 
-	pD3DDeviceContext->CSSetShader(m_heightComputeShader.Get(), NULL, 0);
+	pD3DDeviceContext->UpdateSubresource(m_constantEditPropertyBuf.Get(), 0, nullptr, &m_constantEditProperty, 0, 0);
+	pD3DDeviceContext->CSSetConstantBuffers(3, 1, m_constantEditPropertyBuf.GetAddressOf());
 
-	pD3DDeviceContext->CSSetSamplers(0,1,m_samplerstate.GetAddressOf());
-
-	// シェーダーリソースビューをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetShaderResources(0, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
+	pD3DDeviceContext->CSSetShader(m_newmapComputeShader.Get(), NULL, 0);
 
 	// アンオーダードアクセスビューをコンピュートシェーダーに設定
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, m_ansstrcuturedUAV.GetAddressOf(), NULL);
+	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, m_pHeightMapT2DBufUAV.GetAddressOf(), NULL);
+	pD3DDeviceContext->CSSetUnorderedAccessViews(1, 1, m_pNormalAndTexT2DBufUAV.GetAddressOf(), NULL);
 
 	// コンピュートシェーダーを実行する。
-	pD3DDeviceContext->Dispatch((UINT)m_div, 1, 1);
+	pD3DDeviceContext->Dispatch(m_MapTextureDivSize, 1, 1);
 
-	pD3DDeviceContext->CSSetShader(NULL, NULL, 0);
-
-	ID3D11UnorderedAccessView* ppUAViewNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, ppUAViewNULL, NULL);
-
-	ID3D11ShaderResourceView* ppSRVNULL[2] = { NULL, NULL };
-	pD3DDeviceContext->CSSetShaderResources(0, 2, ppSRVNULL);
-
-	ID3D11Buffer* ppCBNULL[1] = { NULL };
-	pD3DDeviceContext->CSSetConstantBuffers(0, 1, ppCBNULL);
-
-	// アンオーダードアクセスビューのバッファの内容を CPU から読み込み可能なバッファへコピーする
-	ID3D11Buffer* debugbuf = CreateAndCopyToDebugBuf(GetDX11Device(), pD3DDeviceContext, m_ansstrcuturedBuf.Get());
-	D3D11_MAPPED_SUBRESOURCE MappedResource;
-	HRESULT hr = pD3DDeviceContext->Map(debugbuf, 0, D3D11_MAP_READ, 0, &MappedResource);
-	if (SUCCEEDED(hr))
-	{
-		Anser* p = reinterpret_cast<Anser*>(MappedResource.pData);
-		//memcpy_s(&getdata[0], 16 * 16, MappedResource.pData, sizeof(Anser) * 16 * 16);
-		for (size_t i = 0; i < 16*16; i++)
-		{
-
-			getdata[i] = p[i];
-			//printf("%f,", getdata[i].factor.y);
-			//if (i%16==15)
-			//{
-			//	printf("\n");
-			//}
-		}
-		pD3DDeviceContext->Unmap(debugbuf, 0);
-	}
-
-	SAFE_RELEASE(debugbuf);
+	// SRVにコピー
+	pD3DDeviceContext->CopyResource(m_pHeightMapT2DSRBuf.Get(), m_pHeightMapT2DUABuf.Get());
+	pD3DDeviceContext->CopyResource(m_pNormalAndTexT2DSRBuf.Get(), m_pNormalAndTexT2DUABuf.Get());
 }
+
+#pragma endregion
