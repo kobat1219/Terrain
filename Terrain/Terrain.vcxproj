@@ -72,19 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)package\directxtex\lib\x86\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\px86\deb;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)package\directxtex\lib\x64\debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\px64\deb;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)package\directxtex\lib\x86\release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\px86\rel;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)package\directxtex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)package\directxtex\lib\x64\release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)package\directxtex\lib\px64\rel;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
