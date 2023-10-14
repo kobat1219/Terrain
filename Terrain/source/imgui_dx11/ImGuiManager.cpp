@@ -93,9 +93,6 @@ void ImGuiManager::Init()
 	//style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 	
 	//ImGui::StyleColorsDark();
-
-
-	//ImGui::GetWindowDrawList()->AddImage()
 }
 
 void ImGuiManager::NewFrame()

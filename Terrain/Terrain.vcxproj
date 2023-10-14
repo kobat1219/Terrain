@@ -150,7 +150,7 @@
     <ClCompile Include="source\core\Application.cpp" />
     <ClCompile Include="source\core\Game.cpp" />
     <ClCompile Include="source\core\Input.cpp" />
-    <ClCompile Include="source\core\TimeManager.cpp" />
+    <ClCompile Include="source\core\Time.cpp" />
     <ClCompile Include="source\core\WindowCallback.cpp" />
     <ClCompile Include="source\core\WindowManager.cpp" />
     <ClCompile Include="source\core\WinMain.cpp" />
@@ -178,13 +178,12 @@
     <ClInclude Include="source\core\Input.h" />
     <ClInclude Include="source\core\Macro.h" />
     <ClInclude Include="source\core\MyVariables.h" />
-    <ClInclude Include="source\core\TimeManager.h" />
+    <ClInclude Include="source\core\Time.h" />
     <ClInclude Include="source\core\WindowCallback.h" />
     <ClInclude Include="source\core\WindowManager.h" />
     <ClInclude Include="source\directx\DirectXGraphics.h" />
     <ClInclude Include="source\directx\DX11Settransform.h" />
     <ClInclude Include="source\directx\DX11Util.h" />
-    <ClInclude Include="source\graphic\Light.h" />
     <ClInclude Include="source\graphic\Shader.h" />
     <ClInclude Include="source\graphic\Terrain.h" />
     <ClInclude Include="source\imgui_dx11\imconfig.h" />
@@ -208,12 +207,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="shader\csterrainremake.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shader\csterrainupdate.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

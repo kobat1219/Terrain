@@ -15,7 +15,7 @@ void Terrain::Init()
 
 	CreateCSUseSampler();
 
-	CreateGraundTexture();
+	LoadGraundTexture();
 
 	CreateConstantBufferEditData();
 
@@ -93,41 +93,6 @@ void Terrain::NewMap()
 	if (FAILED(hr)) {
 		MessageBox(nullptr, "CreateUnorderedAccessView error", "Error", MB_OK);
 	}
-
-	descuav.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-	descsrv.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-	srDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT; 	// フォーマット
-
-	// 2Dテクスチャを生成
-	hr = device->CreateTexture2D(
-		&descuav,// 作成する2Dテクスチャの設定
-		nullptr,// 
-		&m_pNormalAndTexT2DUABuf);// 作成したテクスチャを受け取る変数
-	if (FAILED(hr))
-		MessageBox(nullptr, "CreateTexture error", "Error", MB_OK);
-
-	hr = device->CreateTexture2D(
-		&descsrv,// 作成する2Dテクスチャの設定
-		nullptr,// 
-		&m_pNormalAndTexT2DSRBuf);// 作成したテクスチャを受け取る変数
-	if (FAILED(hr))
-		MessageBox(nullptr, "CreateTexture error", "Error", MB_OK);
-
-	// シェーダ リソース ビューの生成
-	hr = device->CreateShaderResourceView(
-		m_pNormalAndTexT2DSRBuf.Get(),	// アクセスするテクスチャ リソース
-		&srDesc,		// シェーダ リソース ビューの設定
-		&m_pNormalAndTexT2DBufSRV);	// ＳＲＶ受け取る変数
-	if (FAILED(hr))
-		MessageBox(nullptr, "SRV error", "Error", MB_OK);
-
-	// アンオーダー アクセス ビューの生成
-	hr = device->CreateUnorderedAccessView(m_pNormalAndTexT2DUABuf.Get(), nullptr, m_pNormalAndTexT2DBufUAV.GetAddressOf());
-	if (FAILED(hr)) {
-		MessageBox(nullptr, "CreateUnorderedAccessView error", "Error", MB_OK);
-	}
 }
 
 void Terrain::Draw(const MyEngine::float3& _camerapos)
@@ -141,7 +106,6 @@ void Terrain::Draw(const MyEngine::float3& _camerapos)
 	device->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
 
 	device->DSSetShaderResources(3, 1, m_pHeightMapT2DBufSRV.GetAddressOf());
-	device->DSSetShaderResources(4, 1, m_pNormalAndTexT2DBufSRV.GetAddressOf());
 	device->HSSetShaderResources(10, 1, m_factorStructBufferSRV.GetAddressOf());
 
 	for (size_t i = 0; i < gtexvalue; i++)
@@ -422,7 +386,7 @@ bool Terrain::CreateCSUseSampler()
 	return true;
 }
 
-bool Terrain::CreateGraundTexture()
+bool Terrain::LoadGraundTexture()
 {
 	auto device = GetDX11Device();
 	auto devicecon = GetDX11DeviceContext();
@@ -433,7 +397,7 @@ bool Terrain::CreateGraundTexture()
 		bool isSuccess = CreateSRVfromWICFile(gtexpath[i].c_str(), device, devicecon, tmp.GetAddressOf(), tmpsrv.GetAddressOf());
 		if (!isSuccess)
 		{
-			MessageBox(nullptr, "CreateGraundTexture error", "error", MB_OK);
+			MessageBox(nullptr, "LoadGraundTexture error", "error", MB_OK);
 			return false;
 		}
 		m_gtex[gtexname[i]].Swap(tmp);
@@ -584,14 +548,12 @@ void Terrain::CalNewMapCS()
 
 	// アンオーダードアクセスビューをコンピュートシェーダーに設定
 	pD3DDeviceContext->CSSetUnorderedAccessViews(0, 1, m_pHeightMapT2DBufUAV.GetAddressOf(), NULL);
-	pD3DDeviceContext->CSSetUnorderedAccessViews(1, 1, m_pNormalAndTexT2DBufUAV.GetAddressOf(), NULL);
 
 	// コンピュートシェーダーを実行する。
 	pD3DDeviceContext->Dispatch(m_MapTextureDivSize, 1, 1);
 
 	// SRVにコピー
 	pD3DDeviceContext->CopyResource(m_pHeightMapT2DSRBuf.Get(), m_pHeightMapT2DUABuf.Get());
-	pD3DDeviceContext->CopyResource(m_pNormalAndTexT2DSRBuf.Get(), m_pNormalAndTexT2DUABuf.Get());
 }
 
 #pragma endregion

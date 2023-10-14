@@ -1,8 +1,5 @@
 #pragma once
 
-#include	<DirectXMath.h>
-#include	<wrl/client.h>
-#include	<d3d11.h>
 #include	<vector>
 #include    <unordered_map>
 #include    "../core/MyVariables.h"
@@ -37,7 +34,7 @@ private:
     bool CreateNewMapCS();
     bool CreateShader();
     bool CreateCSUseSampler();
-    bool CreateGraundTexture();
+    bool LoadGraundTexture();
     bool CreateConstantBufferEditData();
     void UpdateFactor(const MyEngine::float3& _camerapos);
 
@@ -74,7 +71,7 @@ private: // variables
     struct ConstantEditProperty
     {
         // x:uvscale y:seed zw:texheight
-        XMFLOAT4 UVScaleAndSeedAndTexHeight = { 1,0,-1.5f,0.5f };
+        XMFLOAT4 UVScaleAndSeedAndTexHeight = { 8,0,-1.5f,0.5f };
     };
 
     ConstantEditProperty m_constantEditProperty;
@@ -95,16 +92,10 @@ private: // variables
     // 高さマップ
     ComPtr<ID3D11Texture2D> m_pHeightMapT2DSRBuf;
     ComPtr<ID3D11Texture2D> m_pHeightMapT2DUABuf;
-    // 法線マップ
-    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DSRBuf;
-    ComPtr<ID3D11Texture2D> m_pNormalAndTexT2DUABuf;
 
     // 高さマップSRV,UAV
     ComPtr<ID3D11ShaderResourceView> m_pHeightMapT2DBufSRV;
     ComPtr<ID3D11UnorderedAccessView> m_pHeightMapT2DBufUAV;
-    // 法線マップSRV,UAV
-    ComPtr<ID3D11ShaderResourceView> m_pNormalAndTexT2DBufSRV;
-    ComPtr<ID3D11UnorderedAccessView> m_pNormalAndTexT2DBufUAV;
 
     // マップテクスチャ幅 1024*1024px
     UINT m_MapTextureDivSize = 1024;

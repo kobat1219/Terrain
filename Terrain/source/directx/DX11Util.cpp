@@ -3,30 +3,8 @@
 #include	"DirectxGraphics.h"
 #include	"../graphic/Shader.h"
 #include	"../core/Memory.h"
-#include	"../graphic/Light.h"
 #include	"DX11Settransform.h"
 #include "DX11Util.h"
-
-Light				g_directionallight;
-
-void DX11LightInit(DirectX::XMFLOAT4 lightpos) {
-	// ƒJƒƒ‰‚ªŠù‚É‰Šú‰»‚³‚ê‚Ä‚¢‚é‘O’ñ
-	g_directionallight.Init({ 0,0,0 }, lightpos);
-	g_directionallight.SetAmbient(XMFLOAT4(0.1f,0.1f,0.1f,1.0f));				// ŠÂ‹«Œõ
-	g_directionallight.Update();
-}
-
-void DX11LightUninit() {
-	g_directionallight.Uninit();
-}
-
-void DX11LightUpdate(DirectX::XMFLOAT4 lpos, DirectX::XMFLOAT3 leye, DirectX::XMFLOAT4 lcolor)
-{
-	g_directionallight.SetEyePos(leye);
-	g_directionallight.SetLightPos(lpos);
-	g_directionallight.SetAmbient(lcolor);				// ŠÂ‹«Œõ
-	g_directionallight.Update();
-}
 
 DirectXGraphics* GetDX11Obj() {
 	return DirectXGraphics::GetInstance();

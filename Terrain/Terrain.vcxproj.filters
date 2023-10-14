@@ -66,7 +66,7 @@
     <ClCompile Include="source\core\WindowCallback.cpp">
       <Filter>見なくていい\ソース ファイル\Core</Filter>
     </ClCompile>
-    <ClCompile Include="source\core\TimeManager.cpp">
+    <ClCompile Include="source\core\Time.cpp">
       <Filter>見なくていい\ソース ファイル\Core</Filter>
     </ClCompile>
     <ClCompile Include="source\core\Input.cpp">
@@ -137,7 +137,7 @@
     <ClInclude Include="source\core\Input.h">
       <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\core\TimeManager.h">
+    <ClInclude Include="source\core\Time.h">
       <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
     </ClInclude>
     <ClInclude Include="source\core\WindowCallback.h">
@@ -188,9 +188,6 @@
     <ClInclude Include="source\graphic\Shader.h">
       <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="source\graphic\Light.h">
-      <Filter>見なくていい\ヘッダー ファイル\Graphic</Filter>
-    </ClInclude>
     <ClInclude Include="source\core\Macro.h">
       <Filter>見なくていい\ヘッダー ファイル\Core</Filter>
     </ClInclude>
@@ -206,9 +203,6 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shader\csheightfactercal.hlsl">
-      <Filter>本題\シェーダーファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="shader\csterrainupdate.hlsl">
       <Filter>本題\シェーダーファイル</Filter>
     </FxCompile>
     <FxCompile Include="shader\dsterrain.hlsl">

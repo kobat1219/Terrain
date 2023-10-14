@@ -25,9 +25,6 @@ void Game::Init()
 
 	m_terrain.Init();
 
-	// 平行光源をセット
-	DX11LightInit(DirectX::XMFLOAT4(0.41f, 1.160f, 0.09f, 0));
-
 	TurnOnAlphablend();
 }
 
@@ -158,7 +155,5 @@ void Game::Finalize()
 {	
 	ImGuiManager::UnInit();
 	
-	DX11LightUninit();
-
 	DX11Uninit();
 }

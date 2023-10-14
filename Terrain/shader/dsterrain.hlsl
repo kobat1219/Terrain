@@ -33,7 +33,7 @@ DS_OUTPUT DS( HS_CONSTANT_OUTPUT In, float2 UV : SV_DomaInLocation, const Output
 	mulmat=mul(mulmat,Projection);
 	Out.pos = mul(Out.pos,(mulmat));	
 	
-    Out.normal = g_Tex[4].SampleLevel(g_SamplerLinear, uv, 0);
+    //Out.normal = g_Tex[4].SampleLevel(g_SamplerLinear, uv, 0);
 
 	return Out;
 }

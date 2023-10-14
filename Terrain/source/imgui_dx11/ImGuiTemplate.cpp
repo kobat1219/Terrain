@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <psapi.h>
 
-#include "../core/TimeManager.h"
+#include "../core/Time.h"
 #include "../directx/DX11Util.h"
 
 using namespace MyEngine;

@@ -1,5 +1,5 @@
 /**-------------------------------------------
-* 洗い出された接点から、テクスチャのデータをペンのテクスチャで書き換える
+* ハイトマップのテクスチャをノイズで生成する
 ---------------------------------------------*/
 #include	"common.hlsl"
 
@@ -30,8 +30,6 @@ float noise(float2 st, int seed)
 
 // ハイトマップ
 RWTexture2D<float> g_heightMap : register(u0);
-// 法線マップ
-RWTexture2D<float4> g_nomalMap : register(u1);
 
 [numthreads(1,1,1)]
 void CS_Main(   
@@ -49,16 +47,6 @@ void CS_Main(
         g_heightMap[uint2(x, did.x)] = noise(uv * EditProperty.x, EditProperty.y);
     }
 
-    // 一片全スレッド高さ変更待ち
+    // 一旦全スレッド高さ変更待ち
     GroupMemoryBarrierWithGroupSync();
-
-    for (x = 0; x < WIDE_VALUE; x++)
-    {       
-        float3 du = { 1, 0, (g_heightMap[uint2(x + 1, did.x)] - g_heightMap[uint2(x - 1, did.x)]) };
-        float3 dv = { 0, 1, (g_heightMap[uint2(x, did.x + 1)] - g_heightMap[uint2(x, did.x - 1)]) };
-
-        float3 vr = normalize(cross(du, dv)) * 0.75 + 0.25;
-        float4 tmp = { vr.x, vr.y, vr.z, g_nomalMap[uint2(x, did.x)].w };
-        g_nomalMap[uint2(x, did.x)] = tmp;
-    }
 }

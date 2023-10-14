@@ -16,7 +16,7 @@
 
 #include "Application.h"
 #include "WindowManager.h"
-#include "TimeManager.h"
+#include "Time.h"
 #include "Input.h"
 #include "../directx/DirectXGraphics.h"
 #include "Game.h"

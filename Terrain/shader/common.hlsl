@@ -24,13 +24,6 @@ cbuffer ConstantBufferEditProperty : register(b3)
     float4 EditProperty;
 }
 
-cbuffer ConstantBufferLight : register(b4)
-{
-	float4 LightDirection;			// 光の方向
-	float4 EyePos;					// 視点位置
-	float4 Ambient;
-}
-
 cbuffer ConstantBufferViewPort : register(b5)
 {
     uint4 ViewportWidth;        // ビューポート幅
@@ -43,6 +36,7 @@ cbuffer ConstantTerrainParam : register(b6)
 	float g_fMaxDistance : packoffset(c1);
 	int g_iMaxDevide : packoffset(c2);
 };
+
 //--------------------------------------------------------------------------------------
 // 構造体定義
 //--------------------------------------------------------------------------------------

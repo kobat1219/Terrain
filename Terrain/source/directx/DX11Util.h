@@ -7,10 +7,6 @@ DirectXGraphics* GetDX11Obj();
 ID3D11Device* GetDX11Device();
 ID3D11DeviceContext*	GetDX11DeviceContext();
 
-void DX11LightInit(DirectX::XMFLOAT4 lightpos);
-void DX11LightUninit();
-void DX11LightUpdate(DirectX::XMFLOAT4 lpos,DirectX::XMFLOAT3 leye,DirectX::XMFLOAT4 lcolor);
-
 /// <summary>
 /// DXÇÃèâä˙âª
 /// </summary>
